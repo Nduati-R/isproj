@@ -34,12 +34,14 @@ const Hero = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
-            <Button variant="hero" size="lg" className="group text-lg px-8 py-6">
+            <Button 
+              variant="hero" 
+              size="lg" 
+              className="group text-lg px-8 py-6"
+              onClick={() => window.location.href = "/auth"}
+            >
               Start Free Trial
               <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button variant="outline" size="lg" className="text-lg px-8 py-6 bg-primary-foreground/10 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/20 backdrop-blur-sm">
-              Watch Demo
             </Button>
           </div>
 
