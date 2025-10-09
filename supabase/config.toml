@@ -1,1 +1,7 @@
 project_id = "bzumhroxlmcmwilpdvlm"
+
+[functions.save-dataset]
+verify_jwt = true
+
+[functions.recommend-crops]
+verify_jwt = true
