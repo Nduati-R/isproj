@@ -30,7 +30,7 @@ serve(async (req) => {
       });
     }
 
-    const { soilData, climateData, datasetId } = await req.json();
+    const { location, soilType, rainfall, datasetId } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
@@ -38,28 +38,21 @@ serve(async (req) => {
     }
 
     // Generate crop recommendations using AI
-    const recommendationPrompt = `You are an expert agricultural advisor. Based on the following soil and climate data, recommend the top 3-5 most suitable crops to grow, with detailed explanations.
+    const recommendationPrompt = `You are an expert agricultural advisor helping farmers. Based on the following simple farm information, recommend the top 3-5 most suitable crops to grow.
 
-Soil Data:
-- Nitrogen (N): ${soilData.nitrogen}
-- Phosphorus (P): ${soilData.phosphorus}
-- Potassium (K): ${soilData.potassium}
-- pH Level: ${soilData.ph}
-- Temperature: ${soilData.temperature}°C
-- Humidity: ${soilData.humidity}%
+Farm Information:
+- Location: ${location}
+- Soil Type: ${soilType}
+- Annual Rainfall: ${rainfall} mm
 
-Climate Data:
-- Rainfall: ${climateData.rainfall} mm
-- Season: ${climateData.season || 'Not specified'}
-- Location: ${climateData.location || 'Not specified'}
+Provide practical recommendations in simple language that a farmer can understand. For each crop, explain:
+1. Crop name and variety (use local names if known)
+2. Why it's good for this soil and rainfall
+3. When to plant
+4. Basic care tips
+5. Expected harvest time
 
-Provide recommendations in the following format:
-1. Crop name and variety
-2. Why it's suitable for these conditions
-3. Expected yield potential
-4. Key cultivation tips
-
-Be specific and practical.`;
+Keep language simple and practical.`;
 
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -126,8 +119,8 @@ ${recommendationText}`;
       .insert({
         user_id: user.id,
         dataset_id: datasetId || null,
-        soil_data: soilData,
-        climate_data: climateData,
+        soil_data: { soilType },
+        climate_data: { location, rainfall },
         recommended_crops: cropNames,
         recommendation_text: recommendationText,
         recommendation_swahili: recommendationSwahili,

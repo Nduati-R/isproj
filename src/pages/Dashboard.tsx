@@ -30,18 +30,10 @@ const Dashboard = () => {
   const [currentRecommendation, setCurrentRecommendation] = useState<Recommendation | null>(null);
   const [language, setLanguage] = useState<'en' | 'sw'>('en');
   
-  // Soil data
-  const [nitrogen, setNitrogen] = useState("");
-  const [phosphorus, setPhosphorus] = useState("");
-  const [potassium, setPotassium] = useState("");
-  const [ph, setPh] = useState("");
-  const [temperature, setTemperature] = useState("");
-  const [humidity, setHumidity] = useState("");
-  
-  // Climate data
-  const [rainfall, setRainfall] = useState("");
-  const [season, setSeason] = useState("");
+  // Simple farmer inputs
   const [location, setLocation] = useState("");
+  const [soilType, setSoilType] = useState("");
+  const [rainfall, setRainfall] = useState("");
   
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -129,19 +121,9 @@ const Dashboard = () => {
     try {
       const { data, error } = await supabase.functions.invoke('recommend-crops', {
         body: {
-          soilData: {
-            nitrogen: parseFloat(nitrogen),
-            phosphorus: parseFloat(phosphorus),
-            potassium: parseFloat(potassium),
-            ph: parseFloat(ph),
-            temperature: parseFloat(temperature),
-            humidity: parseFloat(humidity),
-          },
-          climateData: {
-            rainfall: parseFloat(rainfall),
-            season,
-            location,
-          },
+          location,
+          soilType,
+          rainfall,
         }
       });
 
@@ -154,6 +136,11 @@ const Dashboard = () => {
         title: "Recommendation Generated",
         description: "Your crop recommendations are ready!",
       });
+      
+      // Clear form
+      setLocation("");
+      setSoilType("");
+      setRainfall("");
     } catch (error: any) {
       toast({
         title: "Error",
@@ -203,127 +190,71 @@ const Dashboard = () => {
 
             <TabsContent value="recommend" className="space-y-6 mt-6">
               <div className="grid md:grid-cols-2 gap-6">
-                {/* Soil Data Card */}
+                {/* Simple Input Card */}
                 <Card className="border-border shadow-elegant">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Leaf className="h-5 w-5 text-primary" />
-                      Soil Parameters
+                      Farm Information
                     </CardTitle>
-                    <CardDescription>Enter your soil test results</CardDescription>
+                    <CardDescription>Tell us about your farm</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <form onSubmit={handleGetRecommendation} className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="nitrogen">Nitrogen (N)</Label>
-                          <Input
-                            id="nitrogen"
-                            type="number"
-                            step="0.01"
-                            placeholder="e.g., 50"
-                            value={nitrogen}
-                            onChange={(e) => setNitrogen(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="phosphorus">Phosphorus (P)</Label>
-                          <Input
-                            id="phosphorus"
-                            type="number"
-                            step="0.01"
-                            placeholder="e.g., 40"
-                            value={phosphorus}
-                            onChange={(e) => setPhosphorus(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="potassium">Potassium (K)</Label>
-                          <Input
-                            id="potassium"
-                            type="number"
-                            step="0.01"
-                            placeholder="e.g., 30"
-                            value={potassium}
-                            onChange={(e) => setPotassium(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="ph">pH Level</Label>
-                          <Input
-                            id="ph"
-                            type="number"
-                            step="0.1"
-                            placeholder="e.g., 6.5"
-                            value={ph}
-                            onChange={(e) => setPh(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="temperature">Temperature (°C)</Label>
-                          <Input
-                            id="temperature"
-                            type="number"
-                            step="0.1"
-                            placeholder="e.g., 25"
-                            value={temperature}
-                            onChange={(e) => setTemperature(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="humidity">Humidity (%)</Label>
-                          <Input
-                            id="humidity"
-                            type="number"
-                            step="0.1"
-                            placeholder="e.g., 70"
-                            value={humidity}
-                            onChange={(e) => setHumidity(e.target.value)}
-                            required
-                          />
-                        </div>
+                    <form onSubmit={handleGetRecommendation} className="space-y-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="location" className="text-base">Where is your farm?</Label>
+                        <Input
+                          id="location"
+                          placeholder="e.g., Nairobi, Kenya"
+                          value={location}
+                          onChange={(e) => setLocation(e.target.value)}
+                          required
+                          className="text-lg h-12"
+                        />
                       </div>
-                      <div className="space-y-4 pt-4 border-t">
-                        <h4 className="font-semibold">Climate Data</h4>
-                        <div className="space-y-2">
-                          <Label htmlFor="rainfall">Rainfall (mm)</Label>
-                          <Input
-                            id="rainfall"
-                            type="number"
-                            step="0.1"
-                            placeholder="e.g., 800"
-                            value={rainfall}
-                            onChange={(e) => setRainfall(e.target.value)}
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="season">Season</Label>
-                          <Input
-                            id="season"
-                            placeholder="e.g., Rainy season"
-                            value={season}
-                            onChange={(e) => setSeason(e.target.value)}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="location">Location</Label>
-                          <Input
-                            id="location"
-                            placeholder="e.g., Nairobi, Kenya"
-                            value={location}
-                            onChange={(e) => setLocation(e.target.value)}
-                          />
-                        </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="soilType" className="text-base">What type of soil do you have?</Label>
+                        <select
+                          id="soilType"
+                          value={soilType}
+                          onChange={(e) => setSoilType(e.target.value)}
+                          required
+                          className="flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-lg ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        >
+                          <option value="">Select soil type</option>
+                          <option value="clay">Clay soil (sticky when wet)</option>
+                          <option value="sandy">Sandy soil (loose and grainy)</option>
+                          <option value="loam">Loam soil (dark and crumbly)</option>
+                          <option value="silt">Silt soil (smooth like flour)</option>
+                          <option value="red">Red soil</option>
+                          <option value="black">Black soil (cotton soil)</option>
+                        </select>
                       </div>
-                      <Button type="submit" className="w-full" disabled={recommendationLoading}>
-                        <Leaf className="h-4 w-4 mr-2" />
-                        {recommendationLoading ? "Analyzing..." : "Get Crop Recommendations"}
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="rainfall" className="text-base">How much rain do you get? (mm per year)</Label>
+                        <select
+                          id="rainfall"
+                          value={rainfall}
+                          onChange={(e) => setRainfall(e.target.value)}
+                          required
+                          className="flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-lg ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        >
+                          <option value="">Select rainfall amount</option>
+                          <option value="200">Very low (200mm - Very dry)</option>
+                          <option value="400">Low (400mm - Dry)</option>
+                          <option value="600">Medium-low (600mm)</option>
+                          <option value="800">Medium (800mm)</option>
+                          <option value="1000">Medium-high (1000mm)</option>
+                          <option value="1500">High (1500mm - Good rain)</option>
+                          <option value="2000">Very high (2000mm+ - Heavy rain)</option>
+                        </select>
+                      </div>
+                      
+                      <Button type="submit" className="w-full h-12 text-lg" disabled={recommendationLoading}>
+                        <Leaf className="h-5 w-5 mr-2" />
+                        {recommendationLoading ? "Analyzing..." : "Get Crop Advice"}
                       </Button>
                     </form>
                   </CardContent>
@@ -346,7 +277,7 @@ const Dashboard = () => {
                       )}
                     </div>
                     <CardDescription>
-                      {currentRecommendation ? 'AI-powered crop suggestions' : 'Enter parameters to get started'}
+                      {currentRecommendation ? 'Best crops for your farm' : 'Fill the form to get advice'}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -371,7 +302,7 @@ const Dashboard = () => {
                     ) : (
                       <div className="text-center py-12 text-muted-foreground">
                         <Leaf className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                        <p>Fill in the soil and climate parameters to receive personalized crop recommendations</p>
+                        <p className="text-lg">Tell us about your farm to get crop advice</p>
                       </div>
                     )}
                   </CardContent>
