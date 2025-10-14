@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Sprout, LogOut, Database, Leaf, Languages } from "lucide-react";
+import { Sprout, LogOut, Leaf, Languages, Database } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 interface Recommendation {
@@ -21,10 +21,6 @@ interface Recommendation {
 
 const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
-  const [colabUrl, setColabUrl] = useState("");
-  const [datasetName, setDatasetName] = useState("");
-  const [datasetDescription, setDatasetDescription] = useState("");
-  const [loading, setLoading] = useState(false);
   const [recommendationLoading, setRecommendationLoading] = useState(false);
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [currentRecommendation, setCurrentRecommendation] = useState<Recommendation | null>(null);
@@ -79,40 +75,6 @@ const Dashboard = () => {
       fetchRecommendations();
     }
   }, [user]);
-
-  const handleConnectDataset = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      const { data, error } = await supabase.functions.invoke('save-dataset', {
-        body: {
-          name: datasetName,
-          description: datasetDescription,
-          colabUrl,
-        }
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Dataset Connected",
-        description: "Your dataset has been saved successfully.",
-      });
-
-      setColabUrl("");
-      setDatasetName("");
-      setDatasetDescription("");
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to connect dataset",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleGetRecommendation = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -182,9 +144,8 @@ const Dashboard = () => {
           </div>
 
           <Tabs defaultValue="recommend" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="recommend">Get Recommendation</TabsTrigger>
-              <TabsTrigger value="dataset">Connect Dataset</TabsTrigger>
               <TabsTrigger value="history">History</TabsTrigger>
             </TabsList>
 
@@ -308,59 +269,6 @@ const Dashboard = () => {
                   </CardContent>
                 </Card>
               </div>
-            </TabsContent>
-
-            <TabsContent value="dataset" className="space-y-6 mt-6">
-              <Card className="border-border shadow-elegant max-w-2xl mx-auto">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Database className="h-5 w-5 text-primary" />
-                    Connect Your Dataset
-                  </CardTitle>
-                  <CardDescription>
-                    Link your Google Colab notebook or upload your agricultural dataset
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleConnectDataset} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="dataset-name">Dataset Name</Label>
-                      <Input
-                        id="dataset-name"
-                        placeholder="My Crop Dataset"
-                        value={datasetName}
-                        onChange={(e) => setDatasetName(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="colab-url">Google Colab Notebook URL</Label>
-                      <Input
-                        id="colab-url"
-                        type="url"
-                        placeholder="https://colab.research.google.com/..."
-                        value={colabUrl}
-                        onChange={(e) => setColabUrl(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="dataset-description">Dataset Description</Label>
-                      <Textarea
-                        id="dataset-description"
-                        placeholder="Describe your dataset (soil types, climate data, crop varieties, etc.)"
-                        value={datasetDescription}
-                        onChange={(e) => setDatasetDescription(e.target.value)}
-                        rows={4}
-                      />
-                    </div>
-                    <Button type="submit" className="w-full" disabled={loading}>
-                      <Database className="h-4 w-4 mr-2" />
-                      {loading ? "Connecting..." : "Connect Dataset"}
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
             </TabsContent>
 
             <TabsContent value="history" className="space-y-6 mt-6">
