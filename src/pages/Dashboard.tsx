@@ -21,6 +21,8 @@ interface Recommendation {
 
 const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [userName, setUserName] = useState<string>("");
+  const [isNewUser, setIsNewUser] = useState(false);
   const [recommendationLoading, setRecommendationLoading] = useState(false);
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [currentRecommendation, setCurrentRecommendation] = useState<Recommendation | null>(null);
@@ -38,6 +40,14 @@ const Dashboard = () => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         setUser(session.user);
+        const firstName = session.user.user_metadata?.first_name || "";
+        setUserName(firstName);
+        
+        // Check if user is new (created within last 5 minutes)
+        const createdAt = new Date(session.user.created_at);
+        const now = new Date();
+        const diffMinutes = (now.getTime() - createdAt.getTime()) / (1000 * 60);
+        setIsNewUser(diffMinutes < 5);
       } else {
         navigate("/auth");
       }
@@ -46,6 +56,14 @@ const Dashboard = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
         setUser(session.user);
+        const firstName = session.user.user_metadata?.first_name || "";
+        setUserName(firstName);
+        
+        // Check if user is new
+        const createdAt = new Date(session.user.created_at);
+        const now = new Date();
+        const diffMinutes = (now.getTime() - createdAt.getTime()) / (1000 * 60);
+        setIsNewUser(diffMinutes < 5);
       } else {
         navigate("/auth");
       }
@@ -139,7 +157,9 @@ const Dashboard = () => {
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto space-y-8">
           <div>
-            <h1 className="text-4xl font-bold text-foreground mb-2">Crop Advisory Dashboard</h1>
+            <h1 className="text-4xl font-bold text-foreground mb-2">
+              {userName ? (isNewUser ? `Welcome ${userName}!` : `Welcome back ${userName}!`) : "Crop Advisory Dashboard"}
+            </h1>
             <p className="text-muted-foreground">Get AI-powered crop recommendations based on soil and climate analysis</p>
           </div>
 

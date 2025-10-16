@@ -19,6 +19,9 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [resetMode, setResetMode] = useState(false);
   const [resetSent, setResetSent] = useState(false);
+  const [updatePasswordMode, setUpdatePasswordMode] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -40,7 +43,9 @@ const Auth = () => {
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
+      if (event === 'PASSWORD_RECOVERY') {
+        setUpdatePasswordMode(true);
+      } else if (session) {
         navigate("/");
       }
     });
@@ -136,6 +141,53 @@ const Auth = () => {
     setLoading(false);
   };
 
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (newPassword !== confirmPassword) {
+      toast({
+        title: "Passwords don't match",
+        description: "Please make sure both passwords are the same.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const passwordError = validatePassword(newPassword);
+    if (passwordError) {
+      toast({
+        title: "Invalid password",
+        description: passwordError,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+
+    if (error) {
+      toast({
+        title: "Password update failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Password updated!",
+        description: "You can now sign in with your new password.",
+      });
+      setUpdatePasswordMode(false);
+      setNewPassword("");
+      setConfirmPassword("");
+    }
+
+    setLoading(false);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
       <div className="w-full max-w-md">
@@ -147,16 +199,61 @@ const Auth = () => {
         <Card className="border-border shadow-elegant">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold text-center">
-              {resetMode ? "Reset Password" : "Welcome"}
+              {updatePasswordMode ? "Update Password" : resetMode ? "Reset Password" : "Welcome"}
             </CardTitle>
             <CardDescription className="text-center">
-              {resetMode 
+              {updatePasswordMode 
+                ? "Enter your new password below"
+                : resetMode 
                 ? "Enter your email to receive a password reset link"
                 : "Sign in to access your personalized crop recommendations"}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {resetMode ? (
+            {updatePasswordMode ? (
+              <form onSubmit={handleUpdatePassword} className="space-y-4 mt-4">
+                <div className="space-y-2">
+                  <Label htmlFor="new-password">New Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="new-password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      required
+                      minLength={8}
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirm-password">Confirm New Password</Label>
+                  <Input
+                    id="confirm-password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    minLength={8}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Must be 8+ characters with uppercase, lowercase, number, and special character
+                  </p>
+                </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? "Updating..." : "Update Password"}
+                </Button>
+              </form>
+            ) : resetMode ? (
               resetSent ? (
                 <div className="text-center space-y-4 py-8">
                   <img src={emailVerificationIcon} alt="Email sent" className="w-24 h-24 mx-auto" />
