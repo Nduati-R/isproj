@@ -303,13 +303,13 @@ const Dashboard = () => {
                       {recommendations.map((rec) => (
                         <div
                           key={rec.id}
-                          className="p-4 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors"
+                          className="p-4 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors border border-border"
                           onClick={() => setCurrentRecommendation(rec)}
                         >
-                          <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center justify-between mb-3">
                             <div className="flex flex-wrap gap-2">
                               {rec.recommended_crops.map((crop, idx) => (
-                                <span key={idx} className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
+                                <span key={idx} className="text-xs bg-primary/10 text-primary px-2 py-1 rounded font-medium">
                                   {crop}
                                 </span>
                               ))}
@@ -317,6 +317,11 @@ const Dashboard = () => {
                             <span className="text-xs text-muted-foreground">
                               {new Date(rec.created_at).toLocaleDateString()}
                             </span>
+                          </div>
+                          <div className="prose prose-sm max-w-none">
+                            <pre className="whitespace-pre-wrap text-xs bg-background/50 p-3 rounded border border-border">
+                              {rec.recommendation_text}
+                            </pre>
                           </div>
                         </div>
                       ))}
