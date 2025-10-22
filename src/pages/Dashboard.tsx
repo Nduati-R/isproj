@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
 import { Sprout, LogOut, Leaf, Languages, Database } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
@@ -303,8 +304,7 @@ const Dashboard = () => {
                       {recommendations.map((rec) => (
                         <div
                           key={rec.id}
-                          className="p-4 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 transition-colors border border-border"
-                          onClick={() => setCurrentRecommendation(rec)}
+                          className="p-4 bg-muted rounded-lg border border-border"
                         >
                           <div className="flex items-center justify-between mb-3">
                             <div className="flex flex-wrap gap-2">
@@ -318,11 +318,20 @@ const Dashboard = () => {
                               {new Date(rec.created_at).toLocaleDateString()}
                             </span>
                           </div>
-                          <div className="prose prose-sm max-w-none">
-                            <pre className="whitespace-pre-wrap text-xs bg-background/50 p-3 rounded border border-border">
-                              {rec.recommendation_text}
-                            </pre>
-                          </div>
+                          <Accordion type="single" collapsible className="w-full">
+                            <AccordionItem value="description" className="border-none">
+                              <AccordionTrigger className="text-sm py-2 hover:no-underline">
+                                View Full Description
+                              </AccordionTrigger>
+                              <AccordionContent>
+                                <div className="prose prose-sm max-w-none">
+                                  <pre className="whitespace-pre-wrap text-xs bg-background/50 p-3 rounded border border-border">
+                                    {rec.recommendation_text}
+                                  </pre>
+                                </div>
+                              </AccordionContent>
+                            </AccordionItem>
+                          </Accordion>
                         </div>
                       ))}
                     </div>
