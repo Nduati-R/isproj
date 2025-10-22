@@ -295,8 +295,22 @@ const Dashboard = () => {
             <TabsContent value="history" className="space-y-6 mt-6">
               <Card className="border-border shadow-elegant">
                 <CardHeader>
-                  <CardTitle>Recommendation History</CardTitle>
-                  <CardDescription>Your past crop recommendations</CardDescription>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle>Recommendation History</CardTitle>
+                      <CardDescription>Your past crop recommendations</CardDescription>
+                    </div>
+                    {recommendations.length > 0 && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setLanguage(language === 'en' ? 'sw' : 'en')}
+                      >
+                        <Languages className="h-4 w-4 mr-2" />
+                        {language === 'en' ? 'Kiswahili' : 'English'}
+                      </Button>
+                    )}
+                  </div>
                 </CardHeader>
                 <CardContent>
                   {recommendations.length > 0 ? (
@@ -326,7 +340,7 @@ const Dashboard = () => {
                               <AccordionContent>
                                 <div className="prose prose-sm max-w-none">
                                   <pre className="whitespace-pre-wrap text-xs bg-background/50 p-3 rounded border border-border">
-                                    {rec.recommendation_text}
+                                    {language === 'en' ? rec.recommendation_text : rec.recommendation_swahili}
                                   </pre>
                                 </div>
                               </AccordionContent>
