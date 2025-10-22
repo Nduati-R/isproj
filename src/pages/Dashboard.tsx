@@ -145,7 +145,7 @@ const Dashboard = () => {
             <span className="text-xl font-bold text-foreground">CropAdvisor</span>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">{user.email}</span>
+            <span className="text-sm text-muted-foreground">{user.user_metadata?.first_name || user.email}</span>
             <Button variant="ghost" size="sm" onClick={handleSignOut}>
               <LogOut className="h-4 w-4 mr-2" />
               Sign Out
