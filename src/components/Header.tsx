@@ -52,6 +52,9 @@ const Header = () => {
           {/* Desktop Navigation */}
           {user ? (
             <>
+              <span className="hidden sm:inline-flex text-sm text-muted-foreground mr-2">
+                {user.user_metadata?.first_name || user.email}
+              </span>
               <Button variant="ghost" className="hidden sm:inline-flex" onClick={() => navigate("/dashboard")}>
                 Dashboard
               </Button>
@@ -104,6 +107,9 @@ const Header = () => {
                 <div className="border-t border-border my-4"></div>
                 {user ? (
                   <>
+                    <div className="text-sm text-muted-foreground mb-4">
+                      {user.user_metadata?.first_name || user.email}
+                    </div>
                     <Button 
                       variant="default" 
                       className="w-full" 
