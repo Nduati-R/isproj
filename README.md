@@ -1,73 +1,237 @@
-# Welcome to your Lovable project
+# Intelligent Crop Advisory System (ICAS)
 
-## Project info
+### AI-Powered Crop Recommendation Web Application for Kenyan Smallholder Farmers
 
-**URL**: https://lovable.dev/projects/c38261e2-8bfa-4687-a43b-321d7bf598db
+## Overview
 
-## How can I edit this code?
+The Intelligent Crop Advisory System (ICAS) is a **web-based expert system** that uses machine learning, soil analytics, and climate data to recommend the most suitable crops for Kenyan farmers. The system analyzes soil characteristics, GPS-based location data, and weather conditions to produce personalized, data-driven crop suggestions.
 
-There are several ways of editing your application.
+It leverages:
 
-**Use Lovable**
+* Trained **Random Forest and XGBoost models**
+* **Supabase** for cloud database management
+* **Lovable** for backend deployment
+* **Python (Pandas, NumPy, Scikit-Learn)** for model development
+* A responsive **web interface** for farmer interaction
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/c38261e2-8bfa-4687-a43b-321d7bf598db) and start prompting.
+The goal is to enhance agricultural decision-making and boost farmer productivity through AI-powered insights.
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## Problem Statement
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Kenyan smallholder farmers often struggle with unpredictable weather, limited agronomic knowledge, and inaccurate soil assessments. Many existing agricultural apps, such as PlantNuri, offer general advice but lack:
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+* Soil-specific recommendations
+* Location-aware predictions
+* Machine-learning-driven personalization
 
-Follow these steps:
+ICAS addresses these gaps by delivering **precise, data-backed crop recommendations** based on environmental and agronomic factors unique to each farmer.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+---
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## Project Objectives
 
-# Step 3: Install the necessary dependencies.
-npm i
+* Build an AI-driven crop recommendation system.
+* Utilize soil, climate, and geospatial data for intelligent decision support.
+* Provide a simple, accessible web interface for farmers.
+* Integrate a feedback loop to enhance future model accuracy.
+* Support both English and Swahili for broader accessibility.
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+---
+
+## Tech Stack
+
+### Backend & API
+
+* Python 3.10
+* Flask or Django REST Framework
+* Scikit-Learn, XGBoost
+* Lovable (backend orchestration)
+
+### Frontend
+
+* HTML, CSS, JavaScript
+* Responsive design
+
+### Database
+
+* Supabase (PostgreSQL)
+* GIS-ready storage for location-based queries
+
+### ML & Data Tools
+
+* Pandas
+* NumPy
+* Scikit-Learn
+* Jupyter / Google Colab
+
+---
+
+## Project Structure
+
+```
+├── backend/
+│   ├── app.py                 
+│   ├── model/
+│   │   ├── random_forest.pkl
+│   │   └── xgboost.pkl
+│   ├── utils/
+│   │   └── preprocessing.py
+│   └── requirements.txt
+│
+├── frontend/
+│   ├── index.html
+│   ├── styles.css
+│   ├── main.js
+│
+├── database/
+│   ├── schema.sql
+│   └── supabase-config.json
+│
+├── notebooks/
+│   └── model_training.ipynb
+│
+└── README.md
 ```
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## System Features
 
-**Use GitHub Codespaces**
+### 1. User Input
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Farmers provide:
 
-## What technologies are used for this project?
+* GPS location
+* Soil pH & texture (optional)
+* Farm size
 
-This project is built with:
+### 2. Automated Data Retrieval
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+The system pulls:
 
-## How can I deploy this project?
+* Weather forecast
+* Temperature
+* Rainfall
+* Soil information
 
-Simply open [Lovable](https://lovable.dev/projects/c38261e2-8bfa-4687-a43b-321d7bf598db) and click on Share -> Publish.
+### 3. Crop Recommendation Engine
 
-## Can I connect a custom domain to my Lovable project?
+Using Random Forest & XGBoost, the system analyzes:
 
-Yes, you can!
+* Soil chemistry
+* Weather conditions
+* Geospatial attributes
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Outputs include:
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+* Recommended crops
+* Confidence score
+* Suitability explanation
+
+### 4. Feedback Module
+
+Farmers rate recommendations.
+The data supports future model retraining.
+
+---
+
+## Installation & Setup
+
+### 1. Clone the Repository
+
+```
+git clone https://github.com/Nduati-R/isproj
+cd ICAS
+```
+
+### 2. Backend Setup
+
+```
+cd backend
+pip install -r requirements.txt
+python app.py
+```
+
+### 3. Frontend Setup
+
+Open:
+
+```
+frontend/index.html
+```
+
+### 4. Environment Variables
+
+Create a `.env` file:
+
+```
+SUPABASE_URL=your_supabase_url
+SUPABASE_KEY=your_supabase_key
+MODEL_PATH=model/
+```
+
+---
+
+## Model Training
+
+Models were trained in Google Colab using soil and climate datasets.
+Algorithms used:
+
+* Random Forest
+* XGBoost
+
+Performance evaluated using:
+
+* Accuracy
+* F1-score
+* Cross-validation
+
+Final models stored in `/backend/model/`.
+
+---
+
+## Deployment
+
+The system is deployed using:
+
+* Lovable for backend hosting
+* Supabase for database storage
+* Static hosting for the web interface
+
+---
+
+## Results
+
+ICAS achieved:
+
+* Accurate crop predictions
+* Easy-to-use interface for farmers
+* Efficient response time
+* High scalability through Supabase + Lovable architecture
+
+---
+
+## Future Enhancements
+
+* Integrate handheld soil sensor devices
+* Add NDVI/satellite vegetation interpretation
+* Expand crop variety coverage
+* Add mobile app support
+* Implement deep-learning models (TabNet, CatBoost)
+
+---
+
+##  Author
+
+**Ryan Nduati**
+Strathmore University – Faculty of Computing
+
+---
+
+If you'd like, I can also generate:
+✔ A **LICENSE file**
+✔ A **CONTRIBUTING.md**
+✔ A **project logo**
+✔ GitHub **badges** for your README
