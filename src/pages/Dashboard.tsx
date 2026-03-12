@@ -347,12 +347,29 @@ const Dashboard = () => {
                             </span>
                           ))}
                         </div>
-                        <Button variant="outline" className="w-full" asChild>
-                          <a href={notebook.url} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink className="h-4 w-4 mr-2" />
-                            Open in Colab
-                          </a>
-                        </Button>
+                        {notebook.isPrimary ? (
+                          <div className="flex gap-2">
+                            <Button variant="default" className="flex-1" asChild>
+                              <a href={NOTEBOOK_DOWNLOAD_URL} download>
+                                <Download className="h-4 w-4 mr-2" />
+                                Download .ipynb
+                              </a>
+                            </Button>
+                            <Button variant="outline" className="flex-1" asChild>
+                              <a href={COLAB_UPLOAD_URL} target="_blank" rel="noopener noreferrer">
+                                <ExternalLink className="h-4 w-4 mr-2" />
+                                Open Colab
+                              </a>
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button variant="outline" className="w-full" asChild>
+                            <a href={COLAB_UPLOAD_URL} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="h-4 w-4 mr-2" />
+                              Open in Colab
+                            </a>
+                          </Button>
+                        )}
                       </CardContent>
                     </Card>
                   );
