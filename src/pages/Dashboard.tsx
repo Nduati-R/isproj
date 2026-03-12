@@ -5,11 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
-import { Sprout, LogOut, Leaf, Languages, Database } from "lucide-react";
+import { Sprout, LogOut, Leaf, Languages, Database, ExternalLink, BookOpen, Code, FlaskConical } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 interface Recommendation {
@@ -20,6 +19,30 @@ interface Recommendation {
   created_at: string;
 }
 
+const COLAB_NOTEBOOKS = [
+  {
+    title: "Crop Recommendation Model Training",
+    description: "Train Random Forest & XGBoost models on soil and climate datasets using Scikit-Learn, Pandas, and NumPy.",
+    tags: ["Python", "Scikit-Learn", "XGBoost", "Pandas"],
+    url: "https://colab.research.google.com/",
+    icon: FlaskConical,
+  },
+  {
+    title: "Exploratory Data Analysis (EDA)",
+    description: "Perform statistical analysis on soil composition, rainfall patterns, and crop yield data with Pandas and Matplotlib.",
+    tags: ["Pandas", "NumPy", "Matplotlib", "Statistics"],
+    url: "https://colab.research.google.com/",
+    icon: BookOpen,
+  },
+  {
+    title: "Feature Engineering Pipeline",
+    description: "Build data preprocessing pipelines for soil pH, texture encoding, and climate feature extraction.",
+    tags: ["Pandas", "NumPy", "Scikit-Learn", "Pipeline"],
+    url: "https://colab.research.google.com/",
+    icon: Code,
+  },
+];
+
 const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
   const [userName, setUserName] = useState<string>("");
@@ -28,6 +51,7 @@ const Dashboard = () => {
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [currentRecommendation, setCurrentRecommendation] = useState<Recommendation | null>(null);
   const [language, setLanguage] = useState<'en' | 'sw'>('en');
+  const [colabUrl, setColabUrl] = useState("");
   
   // Simple farmer inputs
   const [location, setLocation] = useState("");
@@ -43,8 +67,6 @@ const Dashboard = () => {
         setUser(session.user);
         const firstName = session.user.user_metadata?.first_name || "";
         setUserName(firstName);
-        
-        // Check if user is new (created within last 5 minutes)
         const createdAt = new Date(session.user.created_at);
         const now = new Date();
         const diffMinutes = (now.getTime() - createdAt.getTime()) / (1000 * 60);
@@ -59,8 +81,6 @@ const Dashboard = () => {
         setUser(session.user);
         const firstName = session.user.user_metadata?.first_name || "";
         setUserName(firstName);
-        
-        // Check if user is new
         const createdAt = new Date(session.user.created_at);
         const now = new Date();
         const diffMinutes = (now.getTime() - createdAt.getTime()) / (1000 * 60);
@@ -79,7 +99,7 @@ const Dashboard = () => {
   };
 
   const fetchRecommendations = async () => {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('crop_recommendations')
       .select('*')
       .order('created_at', { ascending: false });
@@ -101,11 +121,7 @@ const Dashboard = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke('recommend-crops', {
-        body: {
-          location,
-          soilType,
-          rainfall,
-        }
+        body: { location, soilType, rainfall }
       });
 
       if (error) throw error;
@@ -118,7 +134,6 @@ const Dashboard = () => {
         description: "Your crop recommendations are ready!",
       });
       
-      // Clear form
       setLocation("");
       setSoilType("");
       setRainfall("");
@@ -130,6 +145,36 @@ const Dashboard = () => {
       });
     } finally {
       setRecommendationLoading(false);
+    }
+  };
+
+  const handleSaveDataset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!colabUrl) return;
+
+    try {
+      const { error } = await supabase.functions.invoke('save-dataset', {
+        body: {
+          name: `Colab Notebook - ${new Date().toLocaleDateString()}`,
+          description: "Linked Google Colab notebook for data science workflow",
+          colabUrl,
+          data: null,
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Notebook Linked",
+        description: "Your Google Colab notebook has been saved successfully.",
+      });
+      setColabUrl("");
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save notebook link",
+        variant: "destructive",
+      });
     }
   };
 
@@ -165,14 +210,15 @@ const Dashboard = () => {
           </div>
 
           <Tabs defaultValue="recommend" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="recommend">Get Recommendation</TabsTrigger>
+              <TabsTrigger value="notebooks">Data Science</TabsTrigger>
               <TabsTrigger value="history">History</TabsTrigger>
             </TabsList>
 
+            {/* Recommend Tab */}
             <TabsContent value="recommend" className="space-y-6 mt-6">
               <div className="grid md:grid-cols-2 gap-6">
-                {/* Simple Input Card */}
                 <Card className="border-border shadow-elegant">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -185,25 +231,11 @@ const Dashboard = () => {
                     <form onSubmit={handleGetRecommendation} className="space-y-6">
                       <div className="space-y-2">
                         <Label htmlFor="location" className="text-base">Where is your farm?</Label>
-                        <Input
-                          id="location"
-                          placeholder="e.g., Nairobi, Kenya"
-                          value={location}
-                          onChange={(e) => setLocation(e.target.value)}
-                          required
-                          className="text-lg h-12"
-                        />
+                        <Input id="location" placeholder="e.g., Nairobi, Kenya" value={location} onChange={(e) => setLocation(e.target.value)} required className="text-lg h-12" />
                       </div>
-                      
                       <div className="space-y-2">
                         <Label htmlFor="soilType" className="text-base">What type of soil do you have?</Label>
-                        <select
-                          id="soilType"
-                          value={soilType}
-                          onChange={(e) => setSoilType(e.target.value)}
-                          required
-                          className="flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-lg ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                        >
+                        <select id="soilType" value={soilType} onChange={(e) => setSoilType(e.target.value)} required className="flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-lg ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                           <option value="">Select soil type</option>
                           <option value="clay">Clay soil (sticky when wet)</option>
                           <option value="sandy">Sandy soil (loose and grainy)</option>
@@ -213,16 +245,9 @@ const Dashboard = () => {
                           <option value="black">Black soil (cotton soil)</option>
                         </select>
                       </div>
-                      
                       <div className="space-y-2">
                         <Label htmlFor="rainfall" className="text-base">How much rain do you get? (mm per year)</Label>
-                        <select
-                          id="rainfall"
-                          value={rainfall}
-                          onChange={(e) => setRainfall(e.target.value)}
-                          required
-                          className="flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-lg ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                        >
+                        <select id="rainfall" value={rainfall} onChange={(e) => setRainfall(e.target.value)} required className="flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-lg ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                           <option value="">Select rainfall amount</option>
                           <option value="200">Very low (200mm - Very dry)</option>
                           <option value="400">Low (400mm - Dry)</option>
@@ -233,7 +258,6 @@ const Dashboard = () => {
                           <option value="2000">Very high (2000mm+ - Heavy rain)</option>
                         </select>
                       </div>
-                      
                       <Button type="submit" className="w-full h-12 text-lg" disabled={recommendationLoading}>
                         <Leaf className="h-5 w-5 mr-2" />
                         {recommendationLoading ? "Analyzing..." : "Get Crop Advice"}
@@ -242,25 +266,18 @@ const Dashboard = () => {
                   </CardContent>
                 </Card>
 
-                {/* Recommendation Results */}
                 <Card className="border-border shadow-elegant">
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <CardTitle>Recommendations</CardTitle>
                       {currentRecommendation && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setLanguage(language === 'en' ? 'sw' : 'en')}
-                        >
+                        <Button variant="outline" size="sm" onClick={() => setLanguage(language === 'en' ? 'sw' : 'en')}>
                           <Languages className="h-4 w-4 mr-2" />
                           {language === 'en' ? 'Kiswahili' : 'English'}
                         </Button>
                       )}
                     </div>
-                    <CardDescription>
-                      {currentRecommendation ? 'Best crops for your farm' : 'Fill the form to get advice'}
-                    </CardDescription>
+                    <CardDescription>{currentRecommendation ? 'Best crops for your farm' : 'Fill the form to get advice'}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     {currentRecommendation ? (
@@ -275,9 +292,7 @@ const Dashboard = () => {
                         </div>
                         <div className="prose prose-sm max-w-none">
                           <pre className="whitespace-pre-wrap text-sm bg-muted p-4 rounded-lg">
-                            {language === 'en' 
-                              ? currentRecommendation.recommendation_text 
-                              : currentRecommendation.recommendation_swahili}
+                            {language === 'en' ? currentRecommendation.recommendation_text : currentRecommendation.recommendation_swahili}
                           </pre>
                         </div>
                       </div>
@@ -292,6 +307,108 @@ const Dashboard = () => {
               </div>
             </TabsContent>
 
+            {/* Data Science / Notebooks Tab */}
+            <TabsContent value="notebooks" className="space-y-6 mt-6">
+              {/* Tech Stack Banner */}
+              <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-accent/5">
+                <CardContent className="py-6">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className="text-sm font-medium text-foreground">Powered by:</span>
+                    {["Python 3.10", "Pandas", "NumPy", "Scikit-Learn", "XGBoost", "Matplotlib"].map((tech) => (
+                      <span key={tech} className="px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {COLAB_NOTEBOOKS.map((notebook, idx) => {
+                  const Icon = notebook.icon;
+                  return (
+                    <Card key={idx} className="border-border hover:border-primary/40 transition-colors group">
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-lg">
+                          <Icon className="h-5 w-5 text-primary" />
+                          {notebook.title}
+                        </CardTitle>
+                        <CardDescription>{notebook.description}</CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="flex flex-wrap gap-1.5">
+                          {notebook.tags.map((tag) => (
+                            <span key={tag} className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground font-medium">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                        <Button variant="outline" className="w-full" asChild>
+                          <a href={notebook.url} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="h-4 w-4 mr-2" />
+                            Open in Colab
+                          </a>
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+
+              {/* Link Your Notebook */}
+              <Card className="border-border shadow-elegant">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Code className="h-5 w-5 text-primary" />
+                    Link Your Notebook
+                  </CardTitle>
+                  <CardDescription>
+                    Connect your own Google Colab or Jupyter notebook to save it with your project data
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleSaveDataset} className="flex gap-3">
+                    <Input
+                      placeholder="Paste your Google Colab or Jupyter URL..."
+                      value={colabUrl}
+                      onChange={(e) => setColabUrl(e.target.value)}
+                      className="flex-1"
+                    />
+                    <Button type="submit" disabled={!colabUrl}>
+                      Save Link
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+
+              {/* Data Pipeline Overview */}
+              <Card className="border-border shadow-elegant">
+                <CardHeader>
+                  <CardTitle>Data Science Pipeline</CardTitle>
+                  <CardDescription>How your data flows from collection to crop recommendation</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {[
+                      { step: "1", title: "Data Collection", desc: "Soil pH, texture, GPS, rainfall data gathered via Pandas DataFrames" },
+                      { step: "2", title: "Preprocessing", desc: "Feature engineering with NumPy — normalization, encoding, missing value imputation" },
+                      { step: "3", title: "Model Training", desc: "Random Forest & XGBoost trained with Scikit-Learn, evaluated via cross-validation" },
+                      { step: "4", title: "Prediction", desc: "Deployed model generates crop recommendations with confidence scores" },
+                    ].map((item) => (
+                      <div key={item.step} className="relative p-4 rounded-lg bg-muted/50 border border-border">
+                        <div className="absolute -top-3 left-4 bg-primary text-primary-foreground text-xs font-bold px-2 py-0.5 rounded-full">
+                          Step {item.step}
+                        </div>
+                        <h4 className="font-semibold text-sm mt-2 mb-1 text-foreground">{item.title}</h4>
+                        <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* History Tab */}
             <TabsContent value="history" className="space-y-6 mt-6">
               <Card className="border-border shadow-elegant">
                 <CardHeader>
@@ -301,11 +418,7 @@ const Dashboard = () => {
                       <CardDescription>Your past crop recommendations</CardDescription>
                     </div>
                     {recommendations.length > 0 && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setLanguage(language === 'en' ? 'sw' : 'en')}
-                      >
+                      <Button variant="outline" size="sm" onClick={() => setLanguage(language === 'en' ? 'sw' : 'en')}>
                         <Languages className="h-4 w-4 mr-2" />
                         {language === 'en' ? 'Kiswahili' : 'English'}
                       </Button>
@@ -316,27 +429,18 @@ const Dashboard = () => {
                   {recommendations.length > 0 ? (
                     <div className="space-y-4">
                       {recommendations.map((rec) => (
-                        <div
-                          key={rec.id}
-                          className="p-4 bg-muted rounded-lg border border-border"
-                        >
+                        <div key={rec.id} className="p-4 bg-muted rounded-lg border border-border">
                           <div className="flex items-center justify-between mb-3">
                             <div className="flex flex-wrap gap-2">
                               {rec.recommended_crops.map((crop, idx) => (
-                                <span key={idx} className="text-xs bg-primary/10 text-primary px-2 py-1 rounded font-medium">
-                                  {crop}
-                                </span>
+                                <span key={idx} className="text-xs bg-primary/10 text-primary px-2 py-1 rounded font-medium">{crop}</span>
                               ))}
                             </div>
-                            <span className="text-xs text-muted-foreground">
-                              {new Date(rec.created_at).toLocaleDateString()}
-                            </span>
+                            <span className="text-xs text-muted-foreground">{new Date(rec.created_at).toLocaleDateString()}</span>
                           </div>
                           <Accordion type="single" collapsible className="w-full">
                             <AccordionItem value="description" className="border-none">
-                              <AccordionTrigger className="text-sm py-2 hover:no-underline">
-                                View Full Description
-                              </AccordionTrigger>
+                              <AccordionTrigger className="text-sm py-2 hover:no-underline">View Full Description</AccordionTrigger>
                               <AccordionContent>
                                 <div className="prose prose-sm max-w-none">
                                   <pre className="whitespace-pre-wrap text-xs bg-background/50 p-3 rounded border border-border">
