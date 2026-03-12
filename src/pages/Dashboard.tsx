@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
-import { Sprout, LogOut, Leaf, Languages, Database, ExternalLink, BookOpen, Code, FlaskConical } from "lucide-react";
+import { Sprout, LogOut, Leaf, Languages, Database, ExternalLink, BookOpen, Code, FlaskConical, Download } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 interface Recommendation {
@@ -19,27 +19,31 @@ interface Recommendation {
   created_at: string;
 }
 
+// The full notebook is at /notebooks/ICAS_Crop_Recommendation.ipynb
+const NOTEBOOK_DOWNLOAD_URL = "/notebooks/ICAS_Crop_Recommendation.ipynb";
+const COLAB_UPLOAD_URL = "https://colab.research.google.com/#create=true";
+
 const COLAB_NOTEBOOKS = [
   {
-    title: "Crop Recommendation Model Training",
-    description: "Train Random Forest & XGBoost models on soil and climate datasets using Scikit-Learn, Pandas, and NumPy.",
-    tags: ["Python", "Scikit-Learn", "XGBoost", "Pandas"],
-    url: "https://colab.research.google.com/",
+    title: "Full ICAS Pipeline Notebook",
+    description: "Complete end-to-end notebook: data generation, EDA, feature engineering, Random Forest & XGBoost training, evaluation, and model export.",
+    tags: ["Python", "Scikit-Learn", "XGBoost", "Pandas", "NumPy", "Matplotlib"],
     icon: FlaskConical,
+    isPrimary: true,
   },
   {
     title: "Exploratory Data Analysis (EDA)",
-    description: "Perform statistical analysis on soil composition, rainfall patterns, and crop yield data with Pandas and Matplotlib.",
+    description: "Statistical analysis on soil composition, rainfall patterns, and crop yield data with Pandas and Matplotlib.",
     tags: ["Pandas", "NumPy", "Matplotlib", "Statistics"],
-    url: "https://colab.research.google.com/",
     icon: BookOpen,
+    isPrimary: false,
   },
   {
     title: "Feature Engineering Pipeline",
     description: "Build data preprocessing pipelines for soil pH, texture encoding, and climate feature extraction.",
     tags: ["Pandas", "NumPy", "Scikit-Learn", "Pipeline"],
-    url: "https://colab.research.google.com/",
     icon: Code,
+    isPrimary: false,
   },
 ];
 
@@ -343,12 +347,29 @@ const Dashboard = () => {
                             </span>
                           ))}
                         </div>
-                        <Button variant="outline" className="w-full" asChild>
-                          <a href={notebook.url} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink className="h-4 w-4 mr-2" />
-                            Open in Colab
-                          </a>
-                        </Button>
+                        {notebook.isPrimary ? (
+                          <div className="flex gap-2">
+                            <Button variant="default" className="flex-1" asChild>
+                              <a href={NOTEBOOK_DOWNLOAD_URL} download>
+                                <Download className="h-4 w-4 mr-2" />
+                                Download .ipynb
+                              </a>
+                            </Button>
+                            <Button variant="outline" className="flex-1" asChild>
+                              <a href={COLAB_UPLOAD_URL} target="_blank" rel="noopener noreferrer">
+                                <ExternalLink className="h-4 w-4 mr-2" />
+                                Open Colab
+                              </a>
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button variant="outline" className="w-full" asChild>
+                            <a href={COLAB_UPLOAD_URL} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="h-4 w-4 mr-2" />
+                              Open in Colab
+                            </a>
+                          </Button>
+                        )}
                       </CardContent>
                     </Card>
                   );
