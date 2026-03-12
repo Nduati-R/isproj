@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
-import { Sprout, LogOut, Leaf, Languages, Database, ExternalLink, BookOpen, Code, FlaskConical } from "lucide-react";
+import { Sprout, LogOut, Leaf, Languages, Database, ExternalLink, BookOpen, Code, FlaskConical, Download } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 interface Recommendation {
