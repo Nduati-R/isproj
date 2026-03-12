@@ -19,27 +19,31 @@ interface Recommendation {
   created_at: string;
 }
 
+// The full notebook is at /notebooks/ICAS_Crop_Recommendation.ipynb
+const NOTEBOOK_DOWNLOAD_URL = "/notebooks/ICAS_Crop_Recommendation.ipynb";
+const COLAB_UPLOAD_URL = "https://colab.research.google.com/#create=true";
+
 const COLAB_NOTEBOOKS = [
   {
-    title: "Crop Recommendation Model Training",
-    description: "Train Random Forest & XGBoost models on soil and climate datasets using Scikit-Learn, Pandas, and NumPy.",
-    tags: ["Python", "Scikit-Learn", "XGBoost", "Pandas"],
-    url: "https://colab.research.google.com/",
+    title: "Full ICAS Pipeline Notebook",
+    description: "Complete end-to-end notebook: data generation, EDA, feature engineering, Random Forest & XGBoost training, evaluation, and model export.",
+    tags: ["Python", "Scikit-Learn", "XGBoost", "Pandas", "NumPy", "Matplotlib"],
     icon: FlaskConical,
+    isPrimary: true,
   },
   {
     title: "Exploratory Data Analysis (EDA)",
-    description: "Perform statistical analysis on soil composition, rainfall patterns, and crop yield data with Pandas and Matplotlib.",
+    description: "Statistical analysis on soil composition, rainfall patterns, and crop yield data with Pandas and Matplotlib.",
     tags: ["Pandas", "NumPy", "Matplotlib", "Statistics"],
-    url: "https://colab.research.google.com/",
     icon: BookOpen,
+    isPrimary: false,
   },
   {
     title: "Feature Engineering Pipeline",
     description: "Build data preprocessing pipelines for soil pH, texture encoding, and climate feature extraction.",
     tags: ["Pandas", "NumPy", "Scikit-Learn", "Pipeline"],
-    url: "https://colab.research.google.com/",
     icon: Code,
+    isPrimary: false,
   },
 ];
 
