@@ -233,11 +233,16 @@ const Dashboard = () => {
                       </div>
                     </div>
                     <div className="flex flex-col gap-3 min-w-[220px]">
-                      <Button size="lg" className="w-full" asChild>
-                        <a href={NOTEBOOK_DOWNLOAD_URL} download>
-                          <Download className="h-5 w-5 mr-2" />
-                          Download .ipynb
-                        </a>
+                      <Button size="lg" className="w-full" onClick={() => {
+                        const link = document.createElement('a');
+                        link.href = NOTEBOOK_DOWNLOAD_URL;
+                        link.download = 'ICAS_Crop_Recommendation.ipynb';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                      }}>
+                        <Download className="h-5 w-5 mr-2" />
+                        Download .ipynb
                       </Button>
                       <Button variant="outline" size="lg" className="w-full" asChild>
                         <a href={COLAB_UPLOAD_URL} target="_blank" rel="noopener noreferrer">
