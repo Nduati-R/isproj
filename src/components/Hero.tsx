@@ -40,7 +40,7 @@ const Hero = () => {
               className="group text-lg px-8 py-6"
               onClick={() => window.location.href = "/auth"}
             >
-              Start Free Trial
+              Open Dashboard
               <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
@@ -48,15 +48,15 @@ const Hero = () => {
           <div className="pt-8 flex flex-wrap justify-center gap-8 text-primary-foreground/80">
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 bg-accent rounded-full"></div>
-              <span className="text-sm">Available in Swahili</span>
+              <span className="text-sm">Jupyter / Colab Ready</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 bg-accent rounded-full"></div>
-              <span className="text-sm">Works Offline</span>
+              <span className="text-sm">Random Forest & XGBoost</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 bg-accent rounded-full"></div>
-              <span className="text-sm">GPS-Based</span>
+              <span className="text-sm">Kenyan Agricultural Data</span>
             </div>
           </div>
         </div>
