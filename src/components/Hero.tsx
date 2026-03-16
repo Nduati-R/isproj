@@ -20,17 +20,17 @@ const Hero = () => {
         <div className="max-w-4xl mx-auto text-center space-y-8 animate-fade-in">
           <div className="inline-flex items-center gap-2 bg-accent/20 backdrop-blur-sm px-4 py-2 rounded-full border border-accent/30 mb-4">
             <Sparkles className="h-4 w-4 text-accent" />
-            <span className="text-sm font-medium text-primary-foreground">AI-Powered Crop Intelligence</span>
+            <span className="text-sm font-medium text-primary-foreground">Data-Driven Crop Analysis</span>
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold text-primary-foreground leading-tight">
-            Grow Smarter with
-            <span className="text-accent block mt-2">Expert AI Guidance</span>
+            Intelligent Crop
+            <span className="text-accent block mt-2">Advisory System</span>
           </h1>
 
           <p className="text-xl md:text-2xl text-primary-foreground/90 max-w-2xl mx-auto leading-relaxed">
-            Get personalized crop recommendations based on your location, soil, and climate. 
-            Empowering Kenyan farmers with data-driven decisions.
+            A machine learning pipeline for crop recommendations — built with Python, Scikit-Learn & XGBoost.
+            Run the full analysis in JupyterLab or Google Colab.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
@@ -40,7 +40,7 @@ const Hero = () => {
               className="group text-lg px-8 py-6"
               onClick={() => window.location.href = "/auth"}
             >
-              Start Free Trial
+              Open Dashboard
               <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
@@ -48,15 +48,15 @@ const Hero = () => {
           <div className="pt-8 flex flex-wrap justify-center gap-8 text-primary-foreground/80">
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 bg-accent rounded-full"></div>
-              <span className="text-sm">Available in Swahili</span>
+              <span className="text-sm">Jupyter / Colab Ready</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 bg-accent rounded-full"></div>
-              <span className="text-sm">Works Offline</span>
+              <span className="text-sm">Random Forest & XGBoost</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 bg-accent rounded-full"></div>
-              <span className="text-sm">GPS-Based</span>
+              <span className="text-sm">Kenyan Agricultural Data</span>
             </div>
           </div>
         </div>
