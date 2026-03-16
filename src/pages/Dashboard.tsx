@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
-import { Sprout, LogOut, Leaf, Languages, Database, ExternalLink, BookOpen, Code, FlaskConical, Download } from "lucide-react";
+import { Sprout, LogOut, Leaf, Languages, Database, ExternalLink, BookOpen, Code, FlaskConical, Download, Play, Notebook } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 interface Recommendation {
@@ -19,33 +19,8 @@ interface Recommendation {
   created_at: string;
 }
 
-// The full notebook is at /notebooks/ICAS_Crop_Recommendation.ipynb
 const NOTEBOOK_DOWNLOAD_URL = "/notebooks/ICAS_Crop_Recommendation.ipynb";
 const COLAB_UPLOAD_URL = "https://colab.research.google.com/#create=true";
-
-const COLAB_NOTEBOOKS = [
-  {
-    title: "Full ICAS Pipeline Notebook",
-    description: "Complete end-to-end notebook: data generation, EDA, feature engineering, Random Forest & XGBoost training, evaluation, and model export.",
-    tags: ["Python", "Scikit-Learn", "XGBoost", "Pandas", "NumPy", "Matplotlib"],
-    icon: FlaskConical,
-    isPrimary: true,
-  },
-  {
-    title: "Exploratory Data Analysis (EDA)",
-    description: "Statistical analysis on soil composition, rainfall patterns, and crop yield data with Pandas and Matplotlib.",
-    tags: ["Pandas", "NumPy", "Matplotlib", "Statistics"],
-    icon: BookOpen,
-    isPrimary: false,
-  },
-  {
-    title: "Feature Engineering Pipeline",
-    description: "Build data preprocessing pipelines for soil pH, texture encoding, and climate feature extraction.",
-    tags: ["Pandas", "NumPy", "Scikit-Learn", "Pipeline"],
-    icon: Code,
-    isPrimary: false,
-  },
-];
 
 const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -57,7 +32,6 @@ const Dashboard = () => {
   const [language, setLanguage] = useState<'en' | 'sw'>('en');
   const [colabUrl, setColabUrl] = useState("");
   
-  // Simple farmer inputs
   const [location, setLocation] = useState("");
   const [soilType, setSoilType] = useState("");
   const [rainfall, setRainfall] = useState("");
@@ -191,7 +165,10 @@ const Dashboard = () => {
         <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Sprout className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold text-foreground">CropAdvisor</span>
+            <div>
+              <span className="text-xl font-bold text-foreground">ICAS</span>
+              <span className="text-xs text-muted-foreground block -mt-1">Intelligent Crop Advisory System</span>
+            </div>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground">{user.user_metadata?.first_name || user.email}</span>
@@ -208,20 +185,163 @@ const Dashboard = () => {
         <div className="max-w-6xl mx-auto space-y-8">
           <div>
             <h1 className="text-4xl font-bold text-foreground mb-2">
-              {userName ? (isNewUser ? `Welcome ${userName}!` : `Welcome back ${userName}!`) : "Crop Advisory Dashboard"}
+              {userName ? (isNewUser ? `Welcome ${userName}!` : `Welcome back ${userName}!`) : "Data Analysis Dashboard"}
             </h1>
-            <p className="text-muted-foreground">Get AI-powered crop recommendations based on soil and climate analysis</p>
+            <p className="text-muted-foreground">
+              Crop recommendation analysis using Machine Learning — run the full pipeline in Jupyter/Colab
+            </p>
           </div>
 
-          <Tabs defaultValue="recommend" className="w-full">
+          <Tabs defaultValue="notebooks" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="recommend">Get Recommendation</TabsTrigger>
-              <TabsTrigger value="notebooks">Data Science</TabsTrigger>
-              <TabsTrigger value="history">History</TabsTrigger>
+              <TabsTrigger value="notebooks" className="flex items-center gap-2">
+                <FlaskConical className="h-4 w-4" />
+                Notebook & Analysis
+              </TabsTrigger>
+              <TabsTrigger value="demo" className="flex items-center gap-2">
+                <Play className="h-4 w-4" />
+                Quick Demo
+              </TabsTrigger>
+              <TabsTrigger value="history" className="flex items-center gap-2">
+                <Database className="h-4 w-4" />
+                History
+              </TabsTrigger>
             </TabsList>
 
-            {/* Recommend Tab */}
-            <TabsContent value="recommend" className="space-y-6 mt-6">
+            {/* ───── Notebook & Analysis Tab (Primary) ───── */}
+            <TabsContent value="notebooks" className="space-y-6 mt-6">
+              {/* Hero Card – Run the Notebook */}
+              <Card className="border-primary/30 bg-gradient-to-r from-primary/5 via-background to-accent/5 shadow-elegant">
+                <CardContent className="py-8">
+                  <div className="flex flex-col md:flex-row items-center gap-6">
+                    <div className="flex-1 space-y-3">
+                      <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
+                        <Notebook className="h-6 w-6 text-primary" />
+                        ICAS Crop Recommendation Notebook
+                      </h2>
+                      <p className="text-muted-foreground leading-relaxed">
+                        A complete end-to-end ML pipeline: synthetic data generation for Kenyan regions, EDA with visualisations,
+                        feature engineering, Random Forest & XGBoost training, evaluation metrics, and model export.
+                        <strong className="text-foreground"> Download the <code>.ipynb</code> and run it in JupyterLab or Google Colab.</strong>
+                      </p>
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        {["Python 3.10", "Pandas", "NumPy", "Scikit-Learn", "XGBoost", "Matplotlib"].map((tech) => (
+                          <span key={tech} className="px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-3 min-w-[220px]">
+                      <Button size="lg" className="w-full" asChild>
+                        <a href={NOTEBOOK_DOWNLOAD_URL} download>
+                          <Download className="h-5 w-5 mr-2" />
+                          Download .ipynb
+                        </a>
+                      </Button>
+                      <Button variant="outline" size="lg" className="w-full" asChild>
+                        <a href={COLAB_UPLOAD_URL} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink className="h-5 w-5 mr-2" />
+                          Open Google Colab
+                        </a>
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* How to Run */}
+              <Card className="border-border shadow-elegant">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BookOpen className="h-5 w-5 text-primary" />
+                    How to Run the Notebook
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                      <h4 className="font-semibold text-foreground">Option A — JupyterLab (Local)</h4>
+                      <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
+                        <li>Download the <code className="bg-muted px-1 rounded">.ipynb</code> file above</li>
+                        <li>Install JupyterLab: <code className="bg-muted px-1 rounded">pip install jupyterlab</code></li>
+                        <li>Run <code className="bg-muted px-1 rounded">jupyter lab</code> in your terminal</li>
+                        <li>Open the downloaded notebook and run all cells</li>
+                      </ol>
+                    </div>
+                    <div className="space-y-3">
+                      <h4 className="font-semibold text-foreground">Option B — Google Colab (Cloud)</h4>
+                      <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
+                        <li>Download the <code className="bg-muted px-1 rounded">.ipynb</code> file above</li>
+                        <li>Click "Open Google Colab" or go to <code className="bg-muted px-1 rounded">colab.research.google.com</code></li>
+                        <li>Choose <strong>File → Upload notebook</strong> and select the file</li>
+                        <li>Click <strong>Runtime → Run all</strong></li>
+                      </ol>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Data Science Pipeline */}
+              <Card className="border-border shadow-elegant">
+                <CardHeader>
+                  <CardTitle>ML Pipeline Overview</CardTitle>
+                  <CardDescription>How data flows from collection to crop recommendation inside the notebook</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {[
+                      { step: "1", title: "Data Generation", desc: "2,000 synthetic samples for Kenyan regions — soil pH, texture, GPS coordinates, rainfall" },
+                      { step: "2", title: "EDA & Preprocessing", desc: "Visualise distributions, encode categorical features, normalise with StandardScaler" },
+                      { step: "3", title: "Model Training", desc: "Random Forest & XGBoost classifiers trained with stratified cross-validation" },
+                      { step: "4", title: "Evaluation & Export", desc: "Accuracy, F1, confusion matrix — then export models as .pkl for deployment" },
+                    ].map((item) => (
+                      <div key={item.step} className="relative p-4 rounded-lg bg-muted/50 border border-border">
+                        <div className="absolute -top-3 left-4 bg-primary text-primary-foreground text-xs font-bold px-2 py-0.5 rounded-full">
+                          Step {item.step}
+                        </div>
+                        <h4 className="font-semibold text-sm mt-2 mb-1 text-foreground">{item.title}</h4>
+                        <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Link Your Own Notebook */}
+              <Card className="border-border shadow-elegant">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Code className="h-5 w-5 text-primary" />
+                    Link Your Own Notebook
+                  </CardTitle>
+                  <CardDescription>
+                    Save a link to your own Google Colab or Jupyter notebook alongside your project data
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleSaveDataset} className="flex gap-3">
+                    <Input
+                      placeholder="Paste your Google Colab or Jupyter URL..."
+                      value={colabUrl}
+                      onChange={(e) => setColabUrl(e.target.value)}
+                      className="flex-1"
+                    />
+                    <Button type="submit" disabled={!colabUrl}>
+                      Save Link
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* ───── Quick Demo Tab ───── */}
+            <TabsContent value="demo" className="space-y-6 mt-6">
+              <div className="rounded-lg border border-accent/30 bg-accent/5 p-4 text-sm text-muted-foreground">
+                <strong className="text-foreground">Quick Demo:</strong> This simplified form calls an AI model to give instant crop advice.
+                For the full data-science analysis with visualisations and model metrics, use the <strong>Notebook & Analysis</strong> tab.
+              </div>
+
               <div className="grid md:grid-cols-2 gap-6">
                 <Card className="border-border shadow-elegant">
                   <CardHeader>
@@ -311,125 +431,7 @@ const Dashboard = () => {
               </div>
             </TabsContent>
 
-            {/* Data Science / Notebooks Tab */}
-            <TabsContent value="notebooks" className="space-y-6 mt-6">
-              {/* Tech Stack Banner */}
-              <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-accent/5">
-                <CardContent className="py-6">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <span className="text-sm font-medium text-foreground">Powered by:</span>
-                    {["Python 3.10", "Pandas", "NumPy", "Scikit-Learn", "XGBoost", "Matplotlib"].map((tech) => (
-                      <span key={tech} className="px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {COLAB_NOTEBOOKS.map((notebook, idx) => {
-                  const Icon = notebook.icon;
-                  return (
-                    <Card key={idx} className="border-border hover:border-primary/40 transition-colors group">
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-lg">
-                          <Icon className="h-5 w-5 text-primary" />
-                          {notebook.title}
-                        </CardTitle>
-                        <CardDescription>{notebook.description}</CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="flex flex-wrap gap-1.5">
-                          {notebook.tags.map((tag) => (
-                            <span key={tag} className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground font-medium">
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                        {notebook.isPrimary ? (
-                          <div className="flex gap-2">
-                            <Button variant="default" className="flex-1" asChild>
-                              <a href={NOTEBOOK_DOWNLOAD_URL} download>
-                                <Download className="h-4 w-4 mr-2" />
-                                Download .ipynb
-                              </a>
-                            </Button>
-                            <Button variant="outline" className="flex-1" asChild>
-                              <a href={COLAB_UPLOAD_URL} target="_blank" rel="noopener noreferrer">
-                                <ExternalLink className="h-4 w-4 mr-2" />
-                                Open Colab
-                              </a>
-                            </Button>
-                          </div>
-                        ) : (
-                          <Button variant="outline" className="w-full" asChild>
-                            <a href={COLAB_UPLOAD_URL} target="_blank" rel="noopener noreferrer">
-                              <ExternalLink className="h-4 w-4 mr-2" />
-                              Open in Colab
-                            </a>
-                          </Button>
-                        )}
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-
-              {/* Link Your Notebook */}
-              <Card className="border-border shadow-elegant">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Code className="h-5 w-5 text-primary" />
-                    Link Your Notebook
-                  </CardTitle>
-                  <CardDescription>
-                    Connect your own Google Colab or Jupyter notebook to save it with your project data
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleSaveDataset} className="flex gap-3">
-                    <Input
-                      placeholder="Paste your Google Colab or Jupyter URL..."
-                      value={colabUrl}
-                      onChange={(e) => setColabUrl(e.target.value)}
-                      className="flex-1"
-                    />
-                    <Button type="submit" disabled={!colabUrl}>
-                      Save Link
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
-
-              {/* Data Pipeline Overview */}
-              <Card className="border-border shadow-elegant">
-                <CardHeader>
-                  <CardTitle>Data Science Pipeline</CardTitle>
-                  <CardDescription>How your data flows from collection to crop recommendation</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {[
-                      { step: "1", title: "Data Collection", desc: "Soil pH, texture, GPS, rainfall data gathered via Pandas DataFrames" },
-                      { step: "2", title: "Preprocessing", desc: "Feature engineering with NumPy — normalization, encoding, missing value imputation" },
-                      { step: "3", title: "Model Training", desc: "Random Forest & XGBoost trained with Scikit-Learn, evaluated via cross-validation" },
-                      { step: "4", title: "Prediction", desc: "Deployed model generates crop recommendations with confidence scores" },
-                    ].map((item) => (
-                      <div key={item.step} className="relative p-4 rounded-lg bg-muted/50 border border-border">
-                        <div className="absolute -top-3 left-4 bg-primary text-primary-foreground text-xs font-bold px-2 py-0.5 rounded-full">
-                          Step {item.step}
-                        </div>
-                        <h4 className="font-semibold text-sm mt-2 mb-1 text-foreground">{item.title}</h4>
-                        <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* History Tab */}
+            {/* ───── History Tab ───── */}
             <TabsContent value="history" className="space-y-6 mt-6">
               <Card className="border-border shadow-elegant">
                 <CardHeader>
@@ -477,7 +479,7 @@ const Dashboard = () => {
                   ) : (
                     <div className="text-center py-12 text-muted-foreground">
                       <Database className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <p>No recommendations yet. Create your first one!</p>
+                      <p>No recommendations yet. Try the Quick Demo!</p>
                     </div>
                   )}
                 </CardContent>
